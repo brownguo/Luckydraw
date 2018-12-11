@@ -35,7 +35,16 @@ class requests
         return self::$ch;
     }
 
-    public static function request($url,$method,$args,$is_save_cookies,$is_carry_cookies,$cookies=null)
+    //格式化URL参数
+    public static function format_url_args($args)
+    {
+        if(!empty($args))
+        {
+            return http_build_query($args);
+        }
+    }
+
+    public static function request($url,$method,$args,$header = null,$is_save_cookies,$is_carry_cookies,$cookies=null)
     {
         $method = strtoupper($method);
 
@@ -44,7 +53,14 @@ class requests
             $url = $url.(strpos($url, '?') === false ? '?' : '&').http_build_query($args);
         }
 
-        curl_setopt (self::$ch, CURLOPT_REFERER, "https://wx.qq.com/");
+        curl_setopt(self::$ch, CURLOPT_HTTPHEADER, array(
+            "ContentType: application/json; charset=UTF-8"
+        ));
+
+        if(!empty($header))
+        {
+            curl_setopt(self::$ch, CURLOPT_HTTPHEADER, $header);
+        }
 
         if($method == 'POST')
         {
@@ -52,11 +68,6 @@ class requests
             {
                 $args = http_build_query($args);
             }
-
-            curl_setopt(self::$ch, CURLOPT_HTTPHEADER, array(
-                "ContentType: application/json; charset=UTF-8"
-            ));
-
             curl_setopt(self::$ch, CURLOPT_POST, true);
             curl_setopt(self::$ch, CURLOPT_POSTFIELDS,$args);
         }
@@ -80,6 +91,7 @@ class requests
             curl_setopt(self::$ch, CURLOPT_COOKIEFILE,$cookies);
         }
 
+        curl_setopt (self::$ch, CURLOPT_REFERER, "https://www.nike.com/");
         curl_setopt(self::$ch, CURLOPT_ENCODING,'gzip');
         curl_setopt(self::$ch, CURLOPT_URL, $url);
         curl_setopt(self::$ch, CURLINFO_HEADER_OUT, true);
@@ -96,17 +108,17 @@ class requests
         curl_close(self::$ch);
     }
 
-    public static function get($url,$args=null,$is_save_cookies = false,$is_carry_cookies = false)
+    public static function get($url,$args=null,$header=null,$is_save_cookies = false,$is_carry_cookies = false)
     {
         self::_init();
-        self::request($url,'get',$args,$is_save_cookies,$is_carry_cookies);
+        self::request($url,'get',$args,$header,$is_save_cookies,$is_carry_cookies);
         return self::$result;
     }
 
-    public static function post($url,$args,$is_save_cookies = false,$is_carry_cookies = false)
+    public static function post($url,$args,$header,$is_save_cookies = false,$is_carry_cookies = false)
     {
         self::_init();
-        self::request($url,'post',$args,$is_save_cookies,$is_carry_cookies);
+        self::request($url,'post',$args,$header,$is_save_cookies,$is_carry_cookies);
         return self::$result;
     }
 

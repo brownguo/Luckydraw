@@ -11,7 +11,7 @@ class cookies extends SQLite3
     protected $db_path;
     protected $now_time;
     protected $osx_epoch                = 978307200;
-    protected $keychain_pass            = 'FQwydaYjgmz1OZxMTrYrkQ==';
+    protected $keychain_pass            = 'xxxxx';
     protected $salt                     = 'saltysalt';
     protected $erncrypt_key_length      = 16;
     protected $erncrypt_key_iterations  = 1003;

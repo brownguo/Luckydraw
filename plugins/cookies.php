@@ -8,9 +8,15 @@
 
 class cookies extends SQLite3
 {
-    protected  $db_path;
-    protected  $now_time;
-    protected  $osx_epoch = 978307200;
+    protected $db_path;
+    protected $now_time;
+    protected $osx_epoch                = 978307200;
+    protected $keychain_pass            = 'FQwydaYjgmz1OZxMTrYrkQ==';
+    protected $salt                     = 'saltysalt';
+    protected $erncrypt_key_length      = 16;
+    protected $erncrypt_key_iterations  = 1003;
+    protected $iv                       = '                ';
+    protected $get_cookies_url          = 'www.nike.com';   //如果为空的话获取所有cookies
 
     public function __construct()
     {
@@ -23,10 +29,10 @@ class cookies extends SQLite3
         //连接SQLlite
         self::_connect();
         //读取iMessage
-        self::_getCookies();
+        self::_getCookies($this->get_cookies_url);
     }
 
-    public function _checkEnv()
+    protected function _checkEnv()
     {
         logger::notice('检查SqlLite3环境');
 
@@ -35,6 +41,9 @@ class cookies extends SQLite3
         $need_map = array(
             'sqlite3'    =>true,
             'pdo_sqlite' =>true,
+            'openssl'    =>true,
+            'posix'      =>true,
+            'pcntl'      =>true,
         );
 
         foreach ($need_map as $ext_name=>$must_required)
@@ -49,7 +58,7 @@ class cookies extends SQLite3
         }
     }
 
-    public function _connect()
+    protected function _connect()
     {
         $this->open($this->db_path);
 
@@ -65,43 +74,64 @@ class cookies extends SQLite3
     }
 
 
-    public function _getCookies($host_key = 'www.nike.com')
+    protected function _getCookies($host_key = null)
     {
-        $sql = sprintf("select * from cookies where host_key = '%s'",$host_key);
+        if(!is_null($host_key))
+        {
+            $host_key = sprintf("host_key = '%s'",$host_key);
+        }
+        else
+        {
+            $host_key = '1=1';
+        }
+        $sql = sprintf("select * from cookies where %s",$host_key);
+
         $ret = $this->query($sql);
 
         while($row = $ret->fetchArray(SQLITE3_ASSOC))
         {
-           $chromed[] = $row['encrypted_value'];
+           $cookies[$row['name']] = $row['encrypted_value'];
         }
 
-        $c=str_replace('v10','',$chromed[0]);
-//        $c=$chromed[1];
-        $iv = '                ';
+        $res = $this->decrypt_values($cookies);
 
-        echo $c.PHP_EOL.PHP_EOL;
-        $my_pass = 'FQwydaYjgmz1OZxMTrYrkQ==';
-        $salt = utf8_encode('saltysalt');
-        echo $salt.PHP_EOL;
-        $length = 16;
-        $iterations = 1003;
-//        $d_key = openssl_pbkdf2($my_pass,$salt,$length,$iterations);
-        /*
+        if($res)
+        {
+            $this->output_decrypt_cookies($res);
+        }
+        else
+        {
+            logger::notice('Cookies解密失败!');
+            exit(0);
+        }
+    }
 
-        $a = openssl_decrypt($c,'AES-128-CBC',$d_key,0,$iv);
+    public function decrypt_values($encrypt_arr)
+    {
+        if(!is_array($encrypt_arr))
+        {
+            return false;
+        }
+        else
+        {
+            $erncrypt_key = openssl_pbkdf2($this->keychain_pass,$this->salt,
+                $this->erncrypt_key_length,
+                $this->erncrypt_key_iterations);
 
-        var_dump($d_key);
-        echo PHP_EOL;
-        var_dump($a);
-        exit();
+            $decrypt_ret = array();
 
-        var_dump($a);
-        */
-        $d_key = hash_pbkdf2('sha1',$my_pass,$salt,$iterations,$length);
-        $a =  openssl_decrypt($c, 'AES-128-CBC', $d_key, 1, $iv);
-//        $a = openssl_decrypt($c,'AES-128-CBC',$d_key,0,$iv);
-        echo $d_key.PHP_EOL;
-        var_dump($a);
+            foreach ($encrypt_arr as $cookie_key => $encrpty_val)
+            {
+                $encrpty_val = str_replace('v10','',$encrpty_val);
+                $decrypt_ret[$cookie_key] = openssl_decrypt($encrpty_val, 'AES-128-CBC',$erncrypt_key,OPENSSL_RAW_DATA,$this->iv);
+            }
+            return $decrypt_ret;
+        }
+    }
+
+    public function output_decrypt_cookies($cookies)
+    {
+        return $cookies;
     }
 }
 $LoadableModules = array('plugins');
@@ -116,4 +146,4 @@ spl_autoload_register(function($name)
         if (file_exists($filename))
             require_once $filename;
     }
-});$start = new cookies();
+});

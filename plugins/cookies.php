@@ -4,7 +4,7 @@
  * User: guoyexuan
  * Date: 2018/12/11
  * Time: 11:29 AM
- * LastModify:2018年12月13日10:25:50
+ * LastModify:2018年12月13日13:45:04
  */
 
 class cookies extends SQLite3
@@ -12,12 +12,12 @@ class cookies extends SQLite3
     protected $db_path;
     protected $now_time;
     protected $osx_epoch                = 978307200;
-    protected $keychain_pass            = 'xxxxx';
+    protected $keychain_pass            = 'xxxxxx';
     protected $salt                     = 'saltysalt';
     protected $erncrypt_key_length      = 16;
     protected $erncrypt_key_iterations  = 1003;
     protected $iv                       = '                ';
-    protected $get_cookies_url          = 'www.nike.com';   //如果为空的话获取所有cookies
+    protected $get_cookies_url          = 'nike.com';   //如果为空的话获取所有cookies
 
     public function __construct()
     {
@@ -31,6 +31,8 @@ class cookies extends SQLite3
         self::_connect();
         //读取iMessage
         self::_getCookies($this->get_cookies_url);
+        //关闭dhb
+        self::dbh_close();
     }
 
     protected function _checkEnv()
@@ -79,7 +81,7 @@ class cookies extends SQLite3
     {
         if(!is_null($host_key))
         {
-            $host_key = sprintf("host_key = '%s'",$host_key);
+            $host_key = sprintf("host_key like '%s%s%s'",'%',$host_key,'%');
         }
         else
         {
@@ -133,6 +135,11 @@ class cookies extends SQLite3
     public function output_decrypt_cookies($cookies)
     {
         return $cookies;
+    }
+
+    public function dbh_close()
+    {
+        $this->close();
     }
 }
 $LoadableModules = array('plugins');

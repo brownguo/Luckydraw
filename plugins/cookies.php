@@ -12,7 +12,7 @@ class cookies extends SQLite3
     protected $db_path;
     protected $now_time;
     protected $osx_epoch                = 978307200;
-    protected $keychain_pass            = 'xxxxxx';
+    protected $keychain_pass            = 'FQwydaYjgmz1OZxMTrYrkQ==';
     protected $salt                     = 'saltysalt';
     protected $erncrypt_key_length      = 16;
     protected $erncrypt_key_iterations  = 1003;
@@ -26,19 +26,13 @@ class cookies extends SQLite3
         //初始化当前时间
         $this->now_time = microtime(true);
         //检查环境
-        self::_checkEnv();
+        $this->_checkEnv();
         //连接SQLlite
-        self::_connect();
-        //读取iMessage
-        self::_getCookies($this->get_cookies_url);
-        //关闭dhb
-        self::dbh_close();
+        $this->_connect();
     }
 
     protected function _checkEnv()
     {
-        logger::notice('检查SqlLite3环境');
-
         $pad_length = 26;
 
         $need_map = array(
@@ -57,7 +51,6 @@ class cookies extends SQLite3
             {
                 exit($ext_name. " \033[31;40m [NOT SUPORT BUT REQUIRED] \033[0m\n\n\033[31;40mYou have to compile CLI version of PHP with --enable-{$ext_name}\n\n");
             }
-            echo str_pad($ext_name, $pad_length), "\033[32;40m [OK] \033[0m\n";
         }
     }
 
@@ -77,7 +70,7 @@ class cookies extends SQLite3
     }
 
 
-    protected function _getCookies($host_key = null)
+    public function _getCookies($host_key = null)
     {
         if(!is_null($host_key))
         {
@@ -100,7 +93,8 @@ class cookies extends SQLite3
 
         if($res)
         {
-            $this->output_decrypt_cookies($res);
+            $this->dbh_close();
+            return $this->construct_cookies($res);
         }
         else
         {
@@ -109,7 +103,7 @@ class cookies extends SQLite3
         }
     }
 
-    public function decrypt_values($encrypt_arr)
+    protected function decrypt_values($encrypt_arr)
     {
         if(!is_array($encrypt_arr))
         {
@@ -132,9 +126,22 @@ class cookies extends SQLite3
         }
     }
 
-    public function output_decrypt_cookies($cookies)
+    protected function construct_cookies($cookies)
     {
-        return $cookies;
+        if(!is_array($cookies))
+        {
+            return false;
+        }
+        else
+        {
+            $cookies_str = '';
+            foreach ($cookies as $name => $val)
+            {
+                $cookies_str .= $name.'='.$val.';';
+            }
+
+            return trim($cookies_str,';');
+        }
     }
 
     public function dbh_close()

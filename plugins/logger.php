@@ -8,7 +8,7 @@
 
 class logger
 {
-    public static $log_file_path = __DIR__.'/../logs/wechat_bot.log';
+    public static $log_file_path = __DIR__.'/../logs/lucky_draw.log';
 
     public static $foreground_colors = array();
     public static $background_colors = array();

@@ -60,11 +60,11 @@ class cookies extends SQLite3
 
         if($this)
         {
-            logger::notice('Opened database successfully');
+            logger::info('Opened database successfully');
         }
         else
         {
-            logger::notice('Opened database Fail!','error');
+            logger::error('Opened database Fail!','error');
             exit(0);
         }
     }

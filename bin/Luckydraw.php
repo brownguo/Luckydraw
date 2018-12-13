@@ -18,27 +18,41 @@ class Luckydraw
     protected static $request_payload;
     protected static $cookies_domain = 'nike.com';
     protected static $user_token_info = array();
+    protected static $user_services_info = array();
 
 
     public static function _init()
     {
         logger::notice('程序启动');
+
         self::$request_url      = configs::request_url();
         self::$request_args     = configs::request_args();
         self::$request_payload  = configs::request_payload();
-        //用户登录
-        self::_do_login();
+
+        logger::notice('开始登陆');
+
+        foreach (self::$request_payload['login'] as $key => $val)
+        {
+//            if(!self::_do_login($val))
+//            {
+//                //获取cookies
+//                system::call_chrome_browser();
+//                sleep(2);
+//            }
+            self::_do_login($val);
+            continue;
+        }
+
+        self::_get_user_service();
     }
 
-    public static function _do_login()
+    public static function _do_login($login_args)
     {
         $url_args      = requests::format_url_args(self::$request_args['login']);
         $url           = self::$request_url['do_login_url'].$url_args;
 
         $cookies_start = new cookies();
         $cookies_res   = $cookies_start->_getCookies(self::$cookies_domain);
-
-        $login_args    = self::$request_payload['login'][1];    //用户账号
 
         $header        = configs::do_login_header(self::$request_args['login'],$cookies_res,$login_args);
 
@@ -54,10 +68,30 @@ class Luckydraw
         }
         else
         {
-            //可能是Cookies过期了,需要从新打开一下Chrome生成一下Cookies
-            system('open -a "/Applications/Google Chrome.app" "https://www.nike.com/cn/zh_cn/"');
-            sleep(2);
-            call_user_func_array(array('Luckydraw','_do_login'),array(true));
+            return false;
+        }
+    }
+
+    public static function _get_user_service()
+    {
+        logger::notice(sprintf('[%s]个账号登陆成功,正在获取用户信息',count(self::$user_token_info)));
+
+        $url_args      = requests::format_url_args(self::$request_args['getuserservice']);
+        $url           = self::$request_url['get_user_service'].$url_args;
+
+        foreach (self::$user_token_info as $key => $user_token)
+        {
+            $cookies_start = new cookies();
+            $cookies_res   = $cookies_start->_getCookies(self::$cookies_domain);
+
+            foreach ($user_token as $user_id => $val)
+            {
+                $header    = configs::getuserservice(self::$request_args['getuserservice'],$val['access_token'],$cookies_res);
+                $user_info = requests::get($url,null,$header,false,false);
+
+                logger::info($user_info);
+                self::$user_token_info[$key][$user_id]['userservice'] = $user_info;
+            }
         }
 
         print_r(self::$user_token_info);

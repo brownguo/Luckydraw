@@ -118,7 +118,15 @@ class logger
         return date('Y-m-d H:i:s',time());
     }
 
-    public function replace_echo($message, $force_clear_lines = NULL)
+    public static function clear_command_line()
+    {
+        $line = array(27, 91, 72, 27, 91, 50, 74);
+        foreach ($line as $ascii)
+        {
+            echo chr($ascii);
+        }
+    }
+    public static function replace_echo($message,$force_clear_lines = NULL)
     {
         static $last_lines = 0;
         if(!is_null($force_clear_lines))
@@ -133,6 +141,7 @@ class logger
             $term_width = 64;
         }
         $line_count = 0;
+        //循环清除当前行数,用\n分割
         foreach(explode("\n", $message) as $line)
         {
             $line_count += count(str_split($line, $term_width));
@@ -140,45 +149,14 @@ class logger
         for($i = 0; $i < $last_lines; $i++)
         {
             echo "\r";
-            // Erase to the end of the line
             echo "\033[K";
-            // Move cursor Up a line
             echo "\033[1A";
-            // Return to the beginning of the line
             echo "\r";
-            // Erase to the end of the line
             echo "\033[K";
-            // Return to the beginning of the line
             echo "\r";
         }
         $last_lines = $line_count;
         echo $message."\n";
-    }
-
-    public static function display_user_info($user_info)
-    {
-        $display_lenght = 20;
-        echo("\033[1A\n\033[K-----------------------\033[0;34m Sneaker lucky draw \033[0m-------------------------------\n\033[0m");
-        echo("LoginScript version:1.0          PHP version:". PHP_VERSION. "\n");
-        echo("--------------------------------------------------------------------------\n");
-        echo("\033[0;33m账号\033[0m". str_pad('',12 + 2 - strlen('账号')).
-            "\033[0;33mToken\033[0m". str_pad('',$display_lenght + 2 - strlen('Token')).
-            "\033[0;33m代理IP\033[0m \033[1;33m".str_pad('',$display_lenght + 2 - strlen('代理IP')).PHP_EOL);
-
-        $display_str = '';
-
-        foreach ($user_info as $key => $val)
-        {
-            foreach ($val as $user_id => $userinfo)
-            {
-                $userservice = json_decode($userinfo['userservice'],true);
-
-                $display_str .= str_pad($userservice['username'],$display_lenght+2).
-                    str_pad(substr($userinfo['access_token'],0,20),$display_lenght+2).PHP_EOL;
-            }
-        }
-
-        echo $display_str;
     }
 
 

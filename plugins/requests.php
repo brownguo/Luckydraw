@@ -19,8 +19,8 @@ class requests
     protected static $result;
     protected static $out_header;
 
-    protected static $proxy;
-    
+    protected static $proxys;
+
     public static function _init()
     {
         if(!is_resource(self::$ch))
@@ -102,7 +102,14 @@ class requests
             curl_setopt(self::$ch, CURLOPT_SSL_VERIFYHOST, false);
         }
 
-        curl_setopt (self::$ch, CURLOPT_REFERER, "https://www.nike.com/");
+        if(!empty(self::$proxys))
+        {
+            $key = rand(0,count(self::$proxys) - 1);
+            $proxy = self::$proxys[$key];
+            curl_setopt(self::$ch, CURLOPT_PROXY, $proxy);
+        }
+
+        curl_setopt(self::$ch, CURLOPT_REFERER, "https://www.nike.com/");
         curl_setopt(self::$ch, CURLOPT_ENCODING,'gzip');
         curl_setopt(self::$ch, CURLOPT_URL, $url);
         curl_setopt(self::$ch, CURLINFO_HEADER_OUT, true);

@@ -13,12 +13,14 @@ class requests
 
     protected static $ch = null;
 
-    public static $timeout = 30;
-    public static $headers = array();
-    public static $http_info;
-    public static $result;
-    public static $out_header;
+    protected static $timeout = 30;
+    protected static $headers = array();
+    protected static $http_info;
+    protected static $result;
+    protected static $out_header;
 
+    protected static $proxy;
+    
     public static function _init()
     {
         if(!is_resource(self::$ch))
@@ -44,7 +46,7 @@ class requests
         }
     }
 
-    public static function request($url,$method,$args,$header = null,$is_save_cookies,$is_carry_cookies,$cookies=null)
+    public static function request($url,$method,$args,$header = null,$is_save_cookies,$is_carry_cookies,$cookies_name=null)
     {
         $method = strtoupper($method);
 
@@ -74,21 +76,30 @@ class requests
 
         if($is_save_cookies)
         {
-            curl_setopt(self::$ch, CURLOPT_COOKIEJAR, '../logs/cookies.tmp');
+            if($cookies_name !== null)
+            {
+                curl_setopt(self::$ch, CURLOPT_COOKIEJAR, '../logs/'.$cookies_name.'.tmp');
+            }
+            else
+            {
+                curl_setopt(self::$ch, CURLOPT_COOKIEJAR, '../logs/cookies.tmp');
+            }
         }
         if($is_carry_cookies)
         {
-            curl_setopt(self::$ch, CURLOPT_COOKIEFILE, '../logs/cookies.tmp');
+            if($cookies_name !== null)
+            {
+                curl_setopt(self::$ch, CURLOPT_COOKIEFILE, '../logs/'.$cookies_name.'.tmp');
+            }
+            else
+            {
+                curl_setopt(self::$ch, CURLOPT_COOKIEFILE, '../logs/cookies.tmp');
+            }
         }
         if(strpos($url, 'https') !== false)
         {
             curl_setopt(self::$ch, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt(self::$ch, CURLOPT_SSL_VERIFYHOST, false);
-        }
-
-        if(!empty($cookies))
-        {
-            curl_setopt(self::$ch, CURLOPT_COOKIEFILE,$cookies);
         }
 
         curl_setopt (self::$ch, CURLOPT_REFERER, "https://www.nike.com/");
@@ -108,17 +119,17 @@ class requests
         curl_close(self::$ch);
     }
 
-    public static function get($url,$args=null,$header=null,$is_save_cookies = false,$is_carry_cookies = false)
+    public static function get($url,$args=null,$header=null,$is_save_cookies = false,$is_carry_cookies = false,$cookie_name = null)
     {
         self::_init();
-        self::request($url,'get',$args,$header,$is_save_cookies,$is_carry_cookies);
+        self::request($url,'get',$args,$header,$is_save_cookies,$is_carry_cookies,$cookie_name);
         return self::$result;
     }
 
-    public static function post($url,$args,$header,$is_save_cookies = false,$is_carry_cookies = false)
+    public static function post($url,$args,$header,$is_save_cookies = false,$is_carry_cookies = false,$cookie_name = null)
     {
         self::_init();
-        self::request($url,'post',$args,$header,$is_save_cookies,$is_carry_cookies);
+        self::request($url,'post',$args,$header,$is_save_cookies,$is_carry_cookies,$cookie_name);
         return self::$result;
     }
 

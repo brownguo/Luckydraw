@@ -19,6 +19,7 @@ class Luckydraw
     protected static $cookies_domain = 'nike.com';
     protected static $user_token_info = array();
     protected static $user_services_info = array();
+    protected static $login_count = 0;      //登陆账号计数
 
 
     public static function _init()
@@ -30,16 +31,18 @@ class Luckydraw
         self::$request_payload  = configs::request_payload();
 
         logger::notice('开始登陆');
-
         foreach (self::$request_payload['login'] as $key => $val)
         {
-//            if(!self::_do_login($val))
+            self::$login_count ++;
+            self::_do_login($val);
+
+            //每个cookies只能登陆两个账号就失效了,从新获取cookies
+//            if(self::$login_count % 2 != 0)
 //            {
-//                //获取cookies
 //                system::call_chrome_browser();
 //                sleep(2);
 //            }
-            self::_do_login($val);
+            sleep(3);
             continue;
         }
 
@@ -56,7 +59,8 @@ class Luckydraw
 
         $header        = configs::do_login_header(self::$request_args['login'],$cookies_res,$login_args);
 
-        $login_res     = requests::post($url,json_encode($login_args),$header,false,false);
+        //记录用户cookies
+        $login_res     = requests::post($url,json_encode($login_args),$header,false,false,$login_args['username']);
 
         logger::info(print_r($login_res,true));
 
@@ -93,7 +97,6 @@ class Luckydraw
                 self::$user_token_info[$key][$user_id]['userservice'] = $user_info;
             }
         }
-
         print_r(self::$user_token_info);
     }
 }

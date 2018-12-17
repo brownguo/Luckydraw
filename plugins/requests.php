@@ -37,6 +37,11 @@ class requests
         return self::$ch;
     }
 
+    public static function set_proxy($proxy)
+    {
+        self::$proxys = is_array($proxy) ? $proxy : array($proxy);
+    }
+
     //格式化URL参数
     public static function format_url_args($args)
     {

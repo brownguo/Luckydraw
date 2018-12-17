@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>test</title>
+</head>
+<body>
+
+</body>
+</html>
+
+<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script type="application/javascript">
+    $.ajax({
+        // headers:{'Cookie':document.cookie},
+        url:"https://www.nike.com/cn/zh_cn/",
+        success:function(g){
+            var c = document.cookie;
+            alert(c);
+        }
+    });
+</script>

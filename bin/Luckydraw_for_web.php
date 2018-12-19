@@ -37,11 +37,11 @@ class Luckydraw
             self::_do_login($val);
 
             //每个cookies只能登陆两个账号就失效了,从新获取cookies
-//            if(self::$login_count % 2 != 0)
-//            {
-//                system::call_chrome_browser();
-//                sleep(2);
-//            }
+            if(self::$login_count % 2 != 0)
+            {
+                system::call_chrome_browser();
+                sleep(5);
+            }
             sleep(3);
             continue;
         }

@@ -25,39 +25,42 @@ class Luckydraw
     public static function _init()
     {
         logger::notice('程序启动');
+        static::$request_url      = configs::request_url();
+        static::$request_args     = configs::request_args();
+        static::$request_payload  = configs::request_payload();
+    }
+    public static function _run()
+    {
+        //登陆
+        static::_login();
+        //获取用户信息
+        static::_get_user_service();
+    }
 
-        self::$request_url      = configs::request_url();
-        self::$request_args     = configs::request_args();
-        self::$request_payload  = configs::request_payload();
-
+    public static function _login()
+    {
         logger::notice('开始登陆');
-        foreach (self::$request_payload['login'] as $key => $val)
+        foreach (static::$request_payload['login'] as $key => $val)
         {
-            self::$login_count ++;
-            self::_do_login($val);
 
-            //每个cookies只能登陆两个账号就失效了,从新获取cookies
-            if(self::$login_count % 2 != 0)
-            {
-                system::call_chrome_browser();
-                sleep(5);
-            }
-            sleep(3);
+            static::$login_count ++;
+            static::_do_login($val);
+            sleep(2);
             continue;
         }
-
-        self::_get_user_service();
     }
+
 
     public static function _do_login($login_args)
     {
         $url_args      = requests::format_url_args(self::$request_args['login']);
-        $url           = self::$request_url['do_login_url'].$url_args;
 
-        $cookies_start = new cookies();
-        $cookies_res   = $cookies_start->_getCookies(self::$cookies_domain);
+        $url           = static::$request_url['do_login_url'].$url_args;
 
-        $header        = configs::do_login_header(self::$request_args['login'],$cookies_res,$login_args);
+        $cookies       = new cookies();
+        $cookies_res   = $cookies->_getCookies(static::$cookies_domain);
+
+        $header        = configs::do_login_header(static::$request_args['login'],$cookies_res,$login_args);
 
         //记录用户cookies
         $login_res     = requests::post($url,json_encode($login_args),$header,false,false,$login_args['username']);
@@ -68,36 +71,37 @@ class Luckydraw
 
         if(!empty($login_res['user_id']) && !empty($login_res['access_token']))
         {
-            self::$user_token_info[][$login_res['user_id']] = $login_res;
+            static::$user_token_info[][$login_res['user_id']] = $login_res;
         }
         else
         {
-            return false;
+            logger::notice('登陆失败','red');
+            exit(0);
         }
     }
 
     public static function _get_user_service()
     {
-        logger::notice(sprintf('[%s]个账号登陆成功,正在获取用户信息',count(self::$user_token_info)));
+        logger::notice(sprintf('[%s]个账号登陆成功,正在获取用户信息',count(static::$user_token_info)));
 
-        $url_args      = requests::format_url_args(self::$request_args['getuserservice']);
-        $url           = self::$request_url['get_user_service'].$url_args;
+        $url_args      = requests::format_url_args(static::$request_args['getuserservice']);
+        $url           = static::$request_url['get_user_service'].$url_args;
 
         foreach (self::$user_token_info as $key => $user_token)
         {
-            $cookies_start = new cookies();
-            $cookies_res   = $cookies_start->_getCookies(self::$cookies_domain);
+            $cookies       = new cookies();
+            $cookies_res   = $cookies->_getCookies(static::$cookies_domain);
 
             foreach ($user_token as $user_id => $val)
             {
-                $header    = configs::getuserservice(self::$request_args['getuserservice'],$val['access_token'],$cookies_res);
+                $header    = configs::getuserservice(static::$request_args['getuserservice'],$val['access_token'],$cookies_res);
                 $user_info = requests::get($url,null,$header,false,false);
 
                 logger::info($user_info);
-                self::$user_token_info[$key][$user_id]['userservice'] = $user_info;
+                static::$user_token_info[$key][$user_id]['userservice'] = $user_info;
             }
         }
-        print_r(self::$user_token_info);
+        print_r(static::$user_token_info);
     }
 }
 
@@ -114,5 +118,5 @@ spl_autoload_register(function($name)
             require_once $filename;
     }
 });
-$start = new Luckydraw();
-$start->_init();
+Luckydraw::_init();
+Luckydraw::_run();

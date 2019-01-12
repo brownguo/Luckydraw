@@ -32,9 +32,11 @@ class Luckydraw
     public static function _run()
     {
         //登陆
-        static::_login();
+        //static::_login();
         //获取用户信息
-        static::_get_user_service();
+        //static::_get_user_service();
+        //添加购物车
+        static::_addCart();
     }
 
     public static function _login()
@@ -102,6 +104,18 @@ class Luckydraw
             }
         }
         print_r(static::$user_token_info);
+    }
+
+    //可能是用客户端ID来区分用户会话的..这个地方需要在修改
+    public static function _addCart()
+    {
+        $args    = static::$request_args['jcartService'];
+        $url     = static::$request_url['add_cart'].requests::format_url_args($args);
+        $cookies = new cookies();
+        $header  = configs::jcartService($args,$cookies->_getCookies(static::$cookies_domain));
+
+        $res     = requests::get($url,null,$header,false,false);
+        print_r($res);
     }
 }
 

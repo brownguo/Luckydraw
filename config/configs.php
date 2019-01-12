@@ -12,7 +12,9 @@ class configs
     {
         $request_payload = array(
             'login' => array(
-     
+                array(
+             
+                ),
             ) ,
         );
 
@@ -22,21 +24,8 @@ class configs
     {
         $request_args = array(
             'login' => array(
-                'appVersion'            =>'524',
-                'experienceVersion'     =>'422',
-                'uxid'                  =>'com.nike.commerce.snkrs.web',
-                'locale'                =>'zh_CN',
-                'backendEnvironment'    =>'identity',
-                'browser'               =>'Google20%Inc.',
-                'os'                    =>'undefined',
-                'mobile'                =>'false',
-                'native'                =>'false',
-                'visit'                 =>'4',
-                'visitor'               =>'970efaec-dc15-420f-95a5-d25e03525858',
-            ),
-            'getuserservice'=>array(
-                'appVersion'            =>'525',
-                'experienceVersion'     =>'423',
+                'appVersion'            =>'527',
+                'experienceVersion'     =>'425',
                 'uxid'                  =>'com.nike.commerce.snkrs.web',
                 'locale'                =>'zh_CN',
                 'backendEnvironment'    =>'identity',
@@ -45,7 +34,20 @@ class configs
                 'mobile'                =>'false',
                 'native'                =>'false',
                 'visit'                 =>'1',
-                'visitor'               =>'02c27a1e-e24d-48c1-827a-24b8e9339521',
+                'visitor'               =>'835304fd-9e9b-43e3-bc9c-85bf1830d52e',
+            ),
+            'getuserservice'=>array(
+                'appVersion'            =>'527',
+                'experienceVersion'     =>'425',
+                'uxid'                  =>'com.nike.commerce.snkrs.web',
+                'locale'                =>'zh_CN',
+                'backendEnvironment'    =>'identity',
+                'browser'               =>'Google20%Inc.',
+                'os'                    =>'undefined',
+                'mobile'                =>'false',
+                'native'                =>'false',
+                'visit'                 =>'11',
+                'visitor'               =>'835304fd-9e9b-43e3-bc9c-85bf1830d52e',
                 'viewId'                =>'unite',
                 'atgSync'               =>'false',
             )

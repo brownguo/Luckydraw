@@ -142,4 +142,30 @@ class configs
         );
         return $header;
     }
+
+    public static function get_visitor_id()
+    {
+        $maps = array(
+            'a','b','c','d','e','f','g','h',
+            'i','j','k','l','m','n','o','p',
+            'q','r','s','t','u','v','w','x',
+            'y','z','1','2','3','4','5','6',
+            '7','8','9','0'
+        );
+
+        shuffle($maps);
+        $visitor_maps = '';
+
+        foreach ($maps as $key => $val)
+        {
+            $visitor_maps .= $val;
+        }
+
+        $visitor_id = sprintf('%s-%s-%s-%s-%s',
+            substr($visitor_maps, 0,8) ,substr($visitor_maps, 8,4),
+            substr($visitor_maps, 12,4),substr($visitor_maps, 16,4),
+            substr(str_shuffle($visitor_maps), 0, 12));
+
+        return $visitor_id;
+    }
 }

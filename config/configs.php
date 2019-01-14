@@ -8,12 +8,20 @@
 
 class configs
 {
+    protected static $maps = array(
+        'a','b','c','d','e','f','g','h',
+        'i','j','k','l','m','n','o','p',
+        'q','r','s','t','u','v','w','x',
+        'y','z','1','2','3','4','5','6',
+        '7','8','9','0'
+    );
+
     public static function request_payload()
     {
         $request_payload = array(
             'login' => array(
                 array(
-                  
+                   
                 ),
             ) ,
         );
@@ -22,6 +30,8 @@ class configs
     }
     public static function request_args()
     {
+        $visitor_id = static::get_visitor_id();
+
         $request_args = array(
             'login' => array(
                 'appVersion'            =>'527',
@@ -33,8 +43,8 @@ class configs
                 'os'                    =>'undefined',
                 'mobile'                =>'false',
                 'native'                =>'false',
-                'visit'                 =>'1',
-                'visitor'               =>'835304fd-9e9b-43e3-bc9c-85bf1830d52e',
+                'visit'                 =>'26',
+                'visitor'               =>$visitor_id,
             ),
             'getuserservice'=>array(
                 'appVersion'            =>'527',
@@ -46,8 +56,8 @@ class configs
                 'os'                    =>'undefined',
                 'mobile'                =>'false',
                 'native'                =>'false',
-                'visit'                 =>'11',
-                'visitor'               =>'835304fd-9e9b-43e3-bc9c-85bf1830d52e',
+                'visit'                 =>'26',
+                'visitor'               =>$visitor_id,
                 'viewId'                =>'unite',
                 'atgSync'               =>'false',
             ),
@@ -145,13 +155,7 @@ class configs
 
     public static function get_visitor_id()
     {
-        $maps = array(
-            'a','b','c','d','e','f','g','h',
-            'i','j','k','l','m','n','o','p',
-            'q','r','s','t','u','v','w','x',
-            'y','z','1','2','3','4','5','6',
-            '7','8','9','0'
-        );
+        $maps = static::$maps;
 
         shuffle($maps);
         $visitor_maps = '';
@@ -167,5 +171,18 @@ class configs
             substr(str_shuffle($visitor_maps), 0, 12));
 
         return $visitor_id;
+    }
+
+    public static function client_id()
+    {
+        $client_id = '';
+        foreach (static::$maps as $val)
+        {
+            $client_id .= strtoupper($val);
+        }
+        $client_id  = str_shuffle($client_id);
+        $client_len = strlen($client_id);
+
+        return substr($client_id,0,32);
     }
 }

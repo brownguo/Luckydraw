@@ -8,6 +8,18 @@
 
 class configs
 {
+    protected static $ux_id              = 'com.nike.commerce.snkrs.web';
+    protected static $appVersion         = '527';
+    protected static $experienceVersion  = '425';
+    protected static $locale             = 'zh_CN';
+    protected static $backendEnvironment = 'identity';
+    protected static $browser            = 'Google Inc.';
+    protected static $os                 = 'undefined';
+    protected static $mobile             = 'false';
+    protected static $native             = 'false';
+    protected static $visit              = '1';
+    protected static $viewId             = 'unite';
+    protected static $atgSync            = 'false';
     protected static $maps = array(
         'a','b','c','d','e','f','g','h',
         'i','j','k','l','m','n','o','p',
@@ -30,36 +42,36 @@ class configs
     }
     public static function request_args()
     {
-        $visitor_id = static::get_visitor_id();
+        $visitor_id = '3c70a157-4f73-4448-81e6-ca418c6a5f46';
 
         $request_args = array(
             'login' => array(
-                'appVersion'            =>'527',
-                'experienceVersion'     =>'425',
-                'uxid'                  =>'com.nike.commerce.snkrs.web',
-                'locale'                =>'zh_CN',
-                'backendEnvironment'    =>'identity',
-                'browser'               =>'Google20%Inc.',
-                'os'                    =>'undefined',
-                'mobile'                =>'false',
-                'native'                =>'false',
-                'visit'                 =>'26',
+                'appVersion'            =>static::$appVersion,
+                'experienceVersion'     =>static::$experienceVersion,
+                'uxid'                  =>static::$ux_id,
+                'locale'                =>static::$locale,
+                'backendEnvironment'    =>static::$backendEnvironment,
+                'browser'               =>static::$browser,
+                'os'                    =>static::$os,
+                'mobile'                =>static::$mobile,
+                'native'                =>static::$native,
+                'visit'                 =>static::$visit,
                 'visitor'               =>$visitor_id,
             ),
             'getuserservice'=>array(
-                'appVersion'            =>'527',
-                'experienceVersion'     =>'425',
-                'uxid'                  =>'com.nike.commerce.snkrs.web',
-                'locale'                =>'zh_CN',
-                'backendEnvironment'    =>'identity',
-                'browser'               =>'Google20%Inc.',
-                'os'                    =>'undefined',
-                'mobile'                =>'false',
-                'native'                =>'false',
-                'visit'                 =>'26',
+                'appVersion'            =>static::$appVersion,
+                'experienceVersion'     =>static::$experienceVersion,
+                'uxid'                  =>static::$ux_id,
+                'locale'                =>static::$locale,
+                'backendEnvironment'    =>static::$backendEnvironment,
+                'browser'               =>static::$browser,
+                'os'                    =>static::$os,
+                'mobile'                =>static::$mobile,
+                'native'                =>static::$native,
+                'visit'                 =>static::$visit,
                 'visitor'               =>$visitor_id,
-                'viewId'                =>'unite',
-                'atgSync'               =>'false',
+                'viewId'                =>static::$viewId,
+                'atgSync'               =>static::$atgSync,
             ),
             'jcartService'=>array(
                 'action'     =>'addItem',
@@ -83,30 +95,34 @@ class configs
 
     public static function request_url()
     {
+        $login_uri = static::request_args();
+
         return array(
-            'do_login_url'      => 'https://unite.nike.com/login?',
+            'login_url'      => sprintf('https://unite.nike.com/login?%s',http_build_query($login_uri['login'])),
             'get_user_service'  => 'https://unite.nike.com/getUserService?',
             'add_cart'          => 'https://secure-store.nike.com/ap/services/jcartService?',
         );
     }
 
-    public static function do_login_header($path,$cookies,$login_args)
+    public static function login_header($cookies,$args)
     {
-        $header     = array(
+        $path = static::request_args();
+
+        $header = array(
             ':authority: unite.nike.com',
             ':method: POST',
-            ':path: /login?'.http_build_query($path),
+            ':path: /login?'.str_replace('+', '%20', http_build_query($path['login'])),
             ':scheme: https',
             'accept: */*',
             'accept-encoding: gzip, deflate, br',
             'accept-language: zh-CN,zh;q=0.9',
             'cache-control: no-cache',
-            'content-length: '.strlen(json_encode($login_args)),
+            'content-length: '.strlen(json_encode($args)),
             'content-type: application/json',
             'cookie: '.$cookies,
             'origin: https://store.nike.com',
             'pragma: no-cache',
-            'referer: https://store.nike.com/cn/zh_cn/?ipp=120',
+            'referer: https://www.nike.com/cn/launch/t/air-jordan-33-university-red-black/',
             'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36'
         );
         return $header;
@@ -147,7 +163,7 @@ class configs
             'cookie: '.$cookies,
             'origin: https://www.nike.com',
             'pragma: no-cache',
-            'referer: https://www.nike.com/cn/launch/t/air-vapormax-2019-chinese-new-year-pure-platinum/',
+            'referer: https://www.nike.com/cn/launch/t/pg-3-nasa-total-orange/',
             'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36'
         );
         return $header;

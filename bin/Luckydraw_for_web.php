@@ -31,43 +31,26 @@ class Luckydraw
     }
     public static function _run()
     {
-        //登陆
-        //static::_login();
-        //获取用户信息
-        //static::_get_user_service();
-        //添加购物车
-        static::_addCart();
+        static::_login();
     }
 
     public static function _login()
     {
         logger::notice('开始登陆');
-        foreach (static::$request_payload['login'] as $key => $val)
-        {
-
-            static::$login_count ++;
-            static::_do_login($val);
-            sleep(2);
-            continue;
-        }
+        static::$login_count ++;
+        static::_do_login(static::$request_payload['login'][0]);
     }
 
 
     public static function _do_login($login_args)
     {
-        $url_args      = requests::format_url_args(self::$request_args['login']);
-
-        $url           = static::$request_url['do_login_url'].$url_args;
-
+        $url           = static::$request_url['login_url'];
         $cookies       = new cookies();
         $cookies_res   = $cookies->_getCookies(static::$cookies_domain);
 
-        $header        = configs::do_login_header(static::$request_args['login'],$cookies_res,$login_args);
+        $header        = configs::login_header($cookies_res,$login_args);
 
-        //记录用户cookies
-        $login_res     = requests::post($url,json_encode($login_args),$header,false,false,$login_args['username']);
-
-        logger::info(print_r($login_res,true));
+        $login_res     = requests::post($url,json_encode($login_args),$header,false,false);
 
         $login_res     = json_decode($login_res,true);
 
@@ -77,7 +60,7 @@ class Luckydraw
         }
         else
         {
-            logger::notice('登陆失败','red');
+            logger::notice('登陆失败','error');
             exit(0);
         }
     }

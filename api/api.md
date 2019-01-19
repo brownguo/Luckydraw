@@ -1,10 +1,10 @@
-##通信协议简单分析
+## 通信协议简单分析
 
-###获取商品列表
+### 获取商品列表
 
 `https://api.nike.com/launch/launch_views/v2/?filter=productId(dc298414-a87e-5c9d-9ba5-bd0e980b1f03)` //多个商品用逗号隔开
 
-###抽签,总共要请求两个接口,如下
+### 抽签,总共要请求两个接口,如下
 
 + `https://api.nike.com/buy/checkout_previews/v2/9586260c-96bd-40d9-8800-f9aab5757e35` 后面的ID不详
 
